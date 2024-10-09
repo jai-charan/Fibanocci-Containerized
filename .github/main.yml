@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:latest
+        options: >-
+          --privileged
+          --network host
+
+    jaicharans:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Build Docker image for testing
+        run: |
+          docker build -t jaicharan/react-test:latest -f ./client/Dockerfile.dev .
+
+      - name: Run tests
+        run: |
+          docker run -e CI=true jaicharan/react-test:latest npm test
+
+      - name: Build additional Docker images
+        run: |
+          docker build -t jaicharan/multi-client:latest -f ./client .
+          docker build -t jaicharan/multi-nginx:latest -f ./nginx .
+          docker build -t jaicharan/multi-worker:latest -f ./worker .
+          docker build -t jaicharan/multi-server:latest -f ./server .
