@@ -17,15 +17,14 @@ jobs:
         image: docker:latest
         options: >-
           --privileged
-          --network host
 
-    jaicharans:
+    steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Build Docker image for testing
         run: |
-          docker build -t jaicharan/react-test:latest -f ./client/Dockerfile.dev .
+          docker build -t jaicharan/react-test:latest -f ./client/Dockerfile.dev ./client
 
       - name: Run tests
         run: |
@@ -33,7 +32,7 @@ jobs:
 
       - name: Build additional Docker images
         run: |
-          docker build -t jaicharan/multi-client:latest -f ./client .
-          docker build -t jaicharan/multi-nginx:latest -f ./nginx .
-          docker build -t jaicharan/multi-worker:latest -f ./worker .
-          docker build -t jaicharan/multi-server:latest -f ./server .
+          docker build -t jaicharan/multi-client:latest -f ./client/Dockerfile ./client
+          docker build -t jaicharan/multi-nginx:latest -f ./nginx/Dockerfile ./nginx
+          docker build -t jaicharan/multi-worker:latest -f ./worker/Dockerfile ./worker
+          docker build -t jaicharan/multi-server:latest -f ./server/Dockerfile ./server
